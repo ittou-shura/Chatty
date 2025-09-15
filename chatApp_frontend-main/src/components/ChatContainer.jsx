@@ -22,13 +22,15 @@ const ChatContainer = () => {
   const messageEndRef = useRef(null);
 
   useEffect(() => {
-    getMessages(selectedUser._id);
-    getPublicKey(selectedUser._id);
+    if (selectedUser) {
+      getMessages(selectedUser._id);
+      getPublicKey(selectedUser._id);
 
-    subscribeToMessages();
+      subscribeToMessages();
 
-    return () => unsubscribeFromMessages();
-  }, [selectedUser._id, getMessages, subscribeToMessages, unsubscribeFromMessages, getPublicKey]);
+      return () => unsubscribeFromMessages();
+    }
+  }, [selectedUser, getMessages, subscribeToMessages, unsubscribeFromMessages, getPublicKey]);
 
   useEffect(() => {
     if (messageEndRef.current && messages) {
