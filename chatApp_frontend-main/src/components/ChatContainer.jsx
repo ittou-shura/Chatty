@@ -6,34 +6,29 @@ import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
 import { useAuthStore } from "../store/useAuthStore";
 import { formatMessageTime } from "../lib/utils";
-import { useKeyStore } from "../store/useKeyStore";
 
 const ChatContainer = () => {
   const {
     messages,
-    getMessages,
     isMessagesLoading,
     selectedUser,
     subscribeToMessages,
     unsubscribeFromMessages,
   } = useChatStore();
   const { authUser } = useAuthStore();
-  const { getPublicKey } = useKeyStore();
   const messageEndRef = useRef(null);
 
   useEffect(() => {
-    if (selectedUser) {
-      getMessages(selectedUser._id);
-      getPublicKey(selectedUser._id);
+    // Subscribe to real-time messages when the component mounts
+    subscribeToMessages();
 
-      subscribeToMessages();
-
-      return () => unsubscribeFromMessages();
-    }
-  }, [selectedUser, getMessages, subscribeToMessages, unsubscribeFromMessages, getPublicKey]);
+    // Unsubscribe when the component unmounts
+    return () => unsubscribeFromMessages();
+  }, [subscribeToMessages, unsubscribeFromMessages]);
 
   useEffect(() => {
-    if (messageEndRef.current && messages) {
+    // Scroll to the bottom of the chat when new messages arrive
+    if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
@@ -42,7 +37,11 @@ const ChatContainer = () => {
     return (
       <div className="flex-1 flex flex-col overflow-auto">
         <ChatHeader />
-        <MessageSkeleton />
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <MessageSkeleton />
+          <MessageSkeleton />
+          <MessageSkeleton />
+        </div>
         <MessageInput />
       </div>
     );
@@ -53,19 +52,21 @@ const ChatContainer = () => {
       <ChatHeader />
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
+        {messages.map((message, index) => (
           <div
-            key={message._id}
-            className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}
-            ref={messageEndRef}
+            key={message._id || index} // Use index as a fallback key
+            className={`chat ${
+              message.senderId === authUser._id ? "chat-end" : "chat-start"
+            }`}
+            ref={index === messages.length - 1 ? messageEndRef : null}
           >
-            <div className=" chat-image avatar">
+            <div className="chat-image avatar">
               <div className="size-10 rounded-full border">
                 <img
                   src={
                     message.senderId === authUser._id
                       ? authUser.profilePic || "/avatar.png"
-                      : selectedUser.profilePic || "/avatar.png"
+                      : selectedUser?.profilePic || "/avatar.png"
                   }
                   alt="profile pic"
                 />
@@ -88,6 +89,12 @@ const ChatContainer = () => {
             </div>
           </div>
         ))}
+
+        {messages.length === 0 && !isMessagesLoading && (
+          <div className="text-center text-zinc-500 py-4">
+            No messages yet. Start the conversation!
+          </div>
+        )}
       </div>
 
       <MessageInput />
