@@ -15,7 +15,6 @@ import { app, server } from "./lib/socket.js";
 dotenv.config();
 
 const PORT = process.env.PORT || 5002;
-const __dirname = path.resolve();
 
 app.use(cors({
   origin: process.env.CLIENT_URL,  
@@ -31,14 +30,6 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/users", userRoutes);
-
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../chatApp_frontend-main/dist")));
-
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../chatApp_frontend-main", "dist", "index.html"));
-  });
-}
 
 server.listen(PORT, () => {
   console.log("server is running on PORT:" + PORT);
