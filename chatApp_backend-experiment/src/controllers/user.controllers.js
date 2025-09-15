@@ -1,5 +1,14 @@
 import User from "../models/user.models.js";
 
+export const getUsers = async (req, res) => {
+  try {
+    const users = await User.find({}, { password: 0 });
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Could not get users." });
+  }
+};
+
 export const getPublicKey = async (req, res) => {
   const { userId } = req.params;
   try {
