@@ -17,7 +17,7 @@ dotenv.config();
 const PORT = process.env.PORT || 5002;
 
 app.use(cors({
-  origin: process.env.CLIENT_URL,  
+  origin: "https://chatty-beta-snowy.vercel.app",  
   methods: ['GET', 'POST', 'PUT', 'DELETE'],  
   allowedHeaders: ['Content-Type', 'Authorization'],  
   credentials:true                                                 
