@@ -16,12 +16,22 @@ dotenv.config();
 
 const PORT = process.env.PORT || 5002;
 
-app.use(cors({
-  origin: "https://chatty-beta-snowy.vercel.app",  
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],  
-  allowedHeaders: ['Content-Type', 'Authorization'],  
-  credentials:true                                                 
-}));
+const corsOptions = {
+  origin: function (origin, callback) {
+    console.log("REQUEST ORIGIN:", origin); // Log the incoming origin
+    const allowedOrigins = ["https://chatty-beta-snowy.vercel.app"];
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
