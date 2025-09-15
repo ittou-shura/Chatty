@@ -2,6 +2,9 @@ import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare, User } from "lucide-react";
 import { Link } from "react-router-dom";
+import * as nacl from 'tweetnacl';
+import { encodeBase64 } from 'tweetnacl-util';
+
 
 import AuthImagePattern from "../components/AuthImagePattern";
 import toast from "react-hot-toast";
@@ -31,7 +34,19 @@ const SignUpPage = () => {
 
     const success = validateForm();
 
-    if (success === true) signup(formData);
+    if (success === true) {
+      const keyPair = nacl.box.keyPair();
+      const secretKey = keyPair.secretKey;
+      const publicKey = keyPair.publicKey;
+
+      // secretKey and publicKey are Uint8Array, so we need to convert them to a string to store them
+      const secretKeyB64 = encodeBase64(secretKey);
+      const publicKeyB64 = encodeBase64(publicKey);
+
+      localStorage.setItem("secretKey", secretKeyB64);
+
+      signup({ ...formData, publicKey: publicKeyB64 });
+    }
   };
 
   return (

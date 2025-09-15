@@ -19,6 +19,8 @@
     "react-router-dom": "^7.5.0",
     "rtca": "file:..",
     "socket.io-client": "^4.8.1",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.1",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
