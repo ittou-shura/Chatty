@@ -1,8 +1,9 @@
 import User from "../models/user.models.js";
 
 export const getUsers = async (req, res) => {
+  const currentUserId = req.userId;
   try {
-    const users = await User.find({}, { password: 0 });
+    const users = await User.find({ _id: { $ne: currentUserId } }, { password: 0 });
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: "Could not get users." });
