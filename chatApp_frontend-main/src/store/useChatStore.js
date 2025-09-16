@@ -31,7 +31,11 @@ export const useChatStore = create((set, get) => ({
 			const otherUsers = res.data.filter((user) => user._id !== currentUser._id);
 			set({ users: otherUsers });
 		} catch (error) {
-			toast.error(error.response.data.message);
+			if (error.response?.data?.message) {
+				toast.error(error.response.data.message);
+			} else {
+				toast.error("An error occurred while fetching users.");
+			}
 		} finally {
 			set({ isUsersLoading: false });
 		}
