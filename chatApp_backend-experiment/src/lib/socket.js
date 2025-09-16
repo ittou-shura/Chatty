@@ -1,8 +1,19 @@
 import { Server } from "socket.io";
 import http from "http";
 import express from "express";
+import cors from "cors";
 
 const app = express();
+
+const corsOptions = {
+  origin: process.env.CLIENT_URL,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
